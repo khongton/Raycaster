@@ -1,5 +1,6 @@
-#include "data.h"
 #include <math.h>
+#include "data.h"
+#include "vecmath.h"
 
 Vector ScaleVector(Vector toScale, double scalar) {
    Vector scaled;

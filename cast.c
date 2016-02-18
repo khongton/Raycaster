@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "data.h"
+#include "vecmath.h"
+#include "collisions.h"
+#include "cast.h"
 
 //If a sphere is hit compute the distance from it to the 
 //eye and determine what the nearest sphere is

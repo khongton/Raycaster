@@ -1,6 +1,8 @@
-#include "data.h"
 #include <math.h>
 #include <stdio.h>
+#include "data.h"
+#include "vecmath.h"
+#include "collisions.h"
 
 MaybePoint CreateMaybePoint(int boolean, Point point) {
    MaybePoint maybe;
@@ -11,15 +13,29 @@ MaybePoint CreateMaybePoint(int boolean, Point point) {
    return maybe;
 }
 
+/* Convenience function to calculate discriminants. */
 double discriminant(double a, double b, double c) {
    return sqrt(b * b - 4 * a * c);   
 }
 
+/* Determine where the point is along a ray. Essentially, it "slides" a 
+ * point along the given the ray to the point of intersection. */
 Point CalculatePoint(double tVal, Ray rayDir) {
    Vector scaled = ScaleVector(rayDir.dir, tVal);
    return TranslatePoint(rayDir.pt, scaled);
 }
 
+/* Determines which root gives us the point nearest the ray's
+ * origin point. 
+ *
+ * If both roots are non-negative (zero or positive), then the sphere
+ * is in front of the ray. The smaller of the two values gives us the 
+ * desired point.
+ *
+ * If both roots are negative or NaN, then the sphere is behind the ray.
+ *
+ * If one root is non-negative and the other is not, then the non-negative
+ * root originates inside of the sphere and still gives us a desired point */
 MaybePoint rootSolver(double root1, double root2, Ray ray) {
    Point curPoint;
    int pointBool;
@@ -63,8 +79,7 @@ MaybePoint SphereIntersectionPoint(Ray ray, Sphere sphere) {
 }
 
 int FindIntersectionPoints(Sphere *slist, Ray r, int num, Intersected *list) {
-   int i = 0;
-   int numHit = 0;
+   int i, numHit = 0;
    for (i = 0; i < num; i++) {
       MaybePoint mbp = SphereIntersectionPoint(r, slist[i]);
       if (mbp.isPoint) {
