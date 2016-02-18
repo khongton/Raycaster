@@ -2,6 +2,12 @@
 #define DATA_H
 
 typedef struct {
+   double red;
+   double green;
+   double blue;
+} Color;
+
+typedef struct {
    double x;
    double y;
    double z;
@@ -21,6 +27,7 @@ typedef struct {
 typedef struct {
    Point center;
    float radius;
+   Color color;
 } Sphere; //A sphere which we will intersect
 
 typedef struct {
@@ -33,6 +40,8 @@ typedef struct {
    Point *hitPoints;
 } Intersected;
 
+Color CreateColor(double r, double g, double b);
+
 //Initialize a point
 Point CreatePoint(double x, double y, double z);
 
@@ -43,7 +52,7 @@ Vector CreateVector(double x, double y, double z);
 Ray CreateRay(Point origin, Vector direction);
 
 //Initialize a sphere
-Sphere CreateSphere(Point origin, float rad);
+Sphere CreateSphere(Point origin, float rad, Color col);
 
 //Scale a vector by a double value
 Vector ScaleVector(Vector toScale, double scalar);
@@ -77,7 +86,7 @@ int FindIntersectionPoints(Sphere *slist, Ray r, int num, Intersected *list);
 
 Vector SphereNormalAt(Sphere s, Point p);
 
-int castRay(Ray r, Sphere *s, Intersected *i);
+Color castRay(Ray r, Sphere *s, Intersected *i);
 
 void castAllRays(double, double, double, double, int, int, Point, Sphere *s);
 

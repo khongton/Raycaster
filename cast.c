@@ -1,20 +1,13 @@
-//when making PPM format print out header first 
-//printf("P3 %d %d %d\n", width, height, 255);
-//then print out each pixel so
-//printf("%d %d %d\n", red color, green color, blue color);
-
 #include <stdlib.h>
 #include <stdio.h>
 #include "data.h"
 
-//cast_ray(ray r, sphere spheres[], int numSpheres, color ambient, light light, point eye)
+//If a sphere is hit compute the distance from it to the 
+//eye and determine what the nearest sphere is
 
-//we assume that there are two spheres in the viewport - kind of fragile
-//and hardcoded tbh
-
-int castRay(Ray ray, Sphere *spheres, Intersected *list) {
-   int numHits = FindIntersectionPoints(spheres, ray, 100, list);
-   return numHits;
+Color castRay(Ray ray, Sphere *spheres, Intersected *list) {
+   //int numHits = FindIntersectionPoints(spheres, ray, 2, list);
+   return CreateColor(0.0, 0.0, 0.0) ;
 }
 
 void castAllRays(double minX, double maxX, double minY, double maxY, int width,  int height, Point eye, Sphere *spheres) {

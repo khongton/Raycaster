@@ -4,8 +4,14 @@
 #include <assert.h>
 #include "data.h"
 
-//Initializes correctly.
-//Consider using pointers to initialize
+
+Color CreateColor(double r, double g, double b) {
+   Color color;
+   color.red = r;
+   color.green = g;
+   color.blue = b;
+   return color;
+}
 
 Point CreatePoint(double x, double y, double z) {
    Point point;
@@ -30,9 +36,10 @@ Ray CreateRay(Point origin, Vector direction) {
    return ray;
 }
 
-Sphere CreateSphere(Point origin, float rad) {
+Sphere CreateSphere(Point origin, float rad, Color col) {
    Sphere sphere;
    sphere.center = origin;
    sphere.radius = rad;
+   sphere.color = col;
    return sphere;
 }
