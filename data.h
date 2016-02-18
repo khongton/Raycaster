@@ -1,93 +1,55 @@
 #ifndef DATA_H
 #define DATA_H
 
+/* A data structure to represent color in RGB format. */
 typedef struct {
    double red;
    double green;
    double blue;
 } Color;
 
+/* A point in 3D space */
 typedef struct {
    double x;
    double y;
    double z;
-} Point; // a point in 3D space
+} Point; 
 
+/* A 3D vector */
 typedef struct {
    double x;
    double y;
    double z;
-} Vector; //A vector with magnitudes x y z
+} Vector;
 
+/* A ray that extends in one direction in 3D space. 
+ * This data structure is used to simulate light */
 typedef struct {
    Point pt;
    Vector dir;
-} Ray; //A ray going off into space
+} Ray; 
 
+/* A sphere floating in space. 
+ * We will be reflecing the light off the ray */
 typedef struct {
    Point center;
    float radius;
    Color color;
-} Sphere; //A sphere which we will intersect
+} Sphere; 
 
-typedef struct {
-   int isPoint; //boolean if have a point or not
-   Point p; //the point we are looking at
-} MaybePoint;
-
-typedef struct {
-   Sphere *hitSpheres;
-   Point *hitPoints;
-} Intersected;
-
-Color CreateColor(double r, double g, double b);
-
-//Initialize a point
+/* Initialize a point in 3D space */
 Point CreatePoint(double x, double y, double z);
 
-//Initialize a vector
+/* Initialize a vector in 3D space */
 Vector CreateVector(double x, double y, double z);
 
-//Initialize a ray
+/* Initialize a ray given a point and a direction */
 Ray CreateRay(Point origin, Vector direction);
 
-//Initialize a sphere
+/* Initialize a sphere given a point and radius */
 Sphere CreateSphere(Point origin, float rad, Color col);
 
-//Scale a vector by a double value
-Vector ScaleVector(Vector toScale, double scalar);
-
-//returns dot product of two vectors
-double DotProduct(Vector vec1, Vector vec2);
-
-//returns scalar length of a vector
-double VectorLength(Vector len);
-
-//returns the normalized vector
-Vector NormalizeVector(Vector toNormalize);
-
-//returns a vector from the different of two points
-Vector PointDiff(Point point1, Point point2);
-
-//returns a vector from the differnce of two vectors
-Vector VecDiff(Vector vec1, Vector vec2);
-
-//returns a point's position after moved along a vector
-Point TranslatePoint(Point toTrans, Vector dir);
-
-//convenience function for point diff
-Vector fromTo(Point from, Point to);
-
-MaybePoint CreateMaybe(int isPoint, Point p);
-
-MaybePoint SphereIntersectionPoint(Ray r, Sphere s);
-
-int FindIntersectionPoints(Sphere *slist, Ray r, int num, Intersected *list);
-
-Vector SphereNormalAt(Sphere s, Point p);
-
-Color castRay(Ray r, Sphere *s, Intersected *i);
-
-void castAllRays(double, double, double, double, int, int, Point, Sphere *s);
+/* Initialize a color given the RGB values */
+Color CreateColor(double r, double g, double b);
 
 #endif

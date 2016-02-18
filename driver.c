@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include "data.h"
+#include "vecmath.h"
+#include "collisions.h"
+#include "cast.h"
 
 int main() {
    /* Debugging Code */ 
