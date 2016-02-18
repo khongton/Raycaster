@@ -9,6 +9,9 @@
 
 //cast_ray(ray r, sphere spheres[], int numSpheres, color ambient, light light, point eye)
 
+//we assume that there are two spheres in the viewport - kind of fragile
+//and hardcoded tbh
+
 int castRay(Ray ray, Sphere *spheres, Intersected *list) {
    int numHits = FindIntersectionPoints(spheres, ray, 100, list);
    return numHits;
@@ -35,7 +38,7 @@ void castAllRays(double minX, double maxX, double minY, double maxY, int width, 
          p = CreatePoint(picWidth, picHeight, 0.0);
          v = fromTo(eye, p);
          r = CreateRay(eye, v);
-         if (castRay(r, spheres, &list) > 0) {
+         if (FindIntersectionPoints(spheres, r, 2, &list)) {
             printf("0 0 0\n");
          }
          else {
