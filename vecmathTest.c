@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "data.h"
+#include "vecmath.h"
 
 void testScale1() {
    Vector v = CreateVector(1.0, 2.0, 3.0);
@@ -23,4 +24,9 @@ void testScale2() {
 void testScale() {
    testScale1();
    testScale2();
+}
+
+int main() {
+   testScale();
+   printf("All vecmath tests passed\n");
 }

@@ -58,8 +58,14 @@ void testCreateVector3() {
    assert(v.z == -5.6);
 }
 
-void testCreateVectors() {
+void testVectors() {
    testCreateVector1();
    testCreateVector2();
    testCreateVector3();
+}
+
+int main() {
+   testPoints();
+   testVectors();
+   printf("All data tests passed\n");
 }
