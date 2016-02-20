@@ -13,12 +13,19 @@ int main() {
 
    double minX = -10, maxX = 10, minY = -7.5, maxY = 7.5;
    int width = 512, height = 384;
+   
    Point eye = CreatePoint(0.0, 0.0, -14.0);
+   Point blueSphere = CreatePoint(1.0, 1.0, 0.0);
+   Point redSphere = CreatePoint(0.5, 1.5, -3.0);
    Color blue = CreateColor(0.0, 0.0, 1.0);
    Color red = CreateColor(1.0, 0.0, 0.0);
+   Color ambient = CreateColor(0.0, 0.0, 0.0);
+   Finish largeFinish = CreateFinish(0.2);
+   Finish smallFinish = CreateFinish(0.4);
+
    Sphere spheres[2];
-   spheres[0] = CreateSphere(CreatePoint(1.0, 1.0, 0.0), 2.0, blue);
-   spheres[1] = CreateSphere(CreatePoint(0.5, 1.5, -3.0), 0.5, red);
-   castAllRays(minX, maxX, minY, maxY, width, height, eye, spheres);
+   spheres[0] = CreateSphere(blueSphere, 2.0, blue, largeFinish);
+   spheres[1] = CreateSphere(redSphere, 0.5, red, smallFinish);
+   castAllRays(minX, maxX, minY, maxY, width, height, eye, spheres, ambient);
    return 0;
 }
