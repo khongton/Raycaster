@@ -33,10 +33,17 @@ Ray CreateRay(Point origin, Vector direction) {
    return ray;
 }
 
-Sphere CreateSphere(Point origin, float rad, Color col) {
+Sphere CreateSphere(Point origin, double rad, Color col, Finish fin) {
    Sphere sphere;
    sphere.center = origin;
    sphere.radius = rad;
    sphere.color = col;
+   sphere.finish  = fin;
    return sphere;
+}
+
+Finish CreateFinish(double value) {
+   Finish finish;
+   finish.ambient = value;
+   return finish;
 }
