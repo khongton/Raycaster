@@ -4,6 +4,7 @@
 /* A data structure to simulate the effect of light on a color */
 typedef struct {
    double ambient;
+   double diffuse;
 } Finish;
 
 /* A data structure to represent color in RGB format. */
@@ -43,6 +44,12 @@ typedef struct {
    Finish finish;
 } Sphere; 
 
+/* A data structure to simulate light in the scene */
+typedef struct {
+   Point position;
+   Color color;
+} Light;
+
 /* Initialize a point in 3D space */
 Point CreatePoint(double x, double y, double z);
 
@@ -59,6 +66,9 @@ Sphere CreateSphere(Point origin, double rad, Color col, Finish fin);
 Color CreateColor(double r, double g, double b);
 
 /* Initialize a finish value */
-Finish CreateFinish(double fin);
+Finish CreateFinish(double fin, double diff);
+
+/* Initialize a light struct */
+Light CreateLight(Point point, Color color);
 
 #endif
