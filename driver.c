@@ -17,15 +17,22 @@ int main() {
    Point eye = CreatePoint(0.0, 0.0, -14.0);
    Point blueSphere = CreatePoint(1.0, 1.0, 0.0);
    Point redSphere = CreatePoint(0.5, 1.5, -3.0);
+   Point lightPoint = CreatePoint(-100.0, 100.0, -100.0);
+
    Color blue = CreateColor(0.0, 0.0, 1.0);
    Color red = CreateColor(1.0, 0.0, 0.0);
-   Color ambient = CreateColor(0.0, 0.0, 0.0);
-   Finish largeFinish = CreateFinish(0.2);
-   Finish smallFinish = CreateFinish(0.4);
+   Color ambient = CreateColor(1.0, 1.0, 1.0);
+   Color lightColor = CreateColor(1.5, 1.5, 1.5);
+   
+   Finish largeFinish = CreateFinish(0.2, 0.4);
+   Finish smallFinish = CreateFinish(0.4, 0.4);
 
+   Light light = CreateLight(lightPoint, lightColor);
    Sphere spheres[2];
    spheres[0] = CreateSphere(blueSphere, 2.0, blue, largeFinish);
    spheres[1] = CreateSphere(redSphere, 0.5, red, smallFinish);
-   castAllRays(minX, maxX, minY, maxY, width, height, eye, spheres, ambient);
+   
+   castAllRays(minX, maxX, minY, maxY, width, height, eye, spheres, ambient,
+         light);
    return 0;
 }

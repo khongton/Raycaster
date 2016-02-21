@@ -42,8 +42,16 @@ Sphere CreateSphere(Point origin, double rad, Color col, Finish fin) {
    return sphere;
 }
 
-Finish CreateFinish(double value) {
+Finish CreateFinish(double value, double diff) {
    Finish finish;
    finish.ambient = value;
+   finish.diffuse = diff;
    return finish;
+}
+
+Light CreateLight(Point point, Color color) {
+   Light light;
+   light.position = point;
+   light.color = color;
+   return light;
 }
