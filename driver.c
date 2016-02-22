@@ -24,8 +24,8 @@ int main() {
    Color ambient = CreateColor(1.0, 1.0, 1.0);
    Color lightColor = CreateColor(1.5, 1.5, 1.5);
    
-   Finish largeFinish = CreateFinish(0.2, 0.4);
-   Finish smallFinish = CreateFinish(0.4, 0.4);
+   Finish largeFinish = CreateFinish(0.2, 0.4, 0.5, 0.05);
+   Finish smallFinish = CreateFinish(0.4, 0.4, 0.5, 0.05);
 
    Light light = CreateLight(lightPoint, lightColor);
    Sphere spheres[2];

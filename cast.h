@@ -12,11 +12,12 @@ double distance(Point p1, Point p2);
 /* Cast a ray from the eye into the scene to determine the color 
  * we should print to the screen. Prints the color of the sphere hit 
  * or white if it hit nothing */
-Color castRay(int numHits, Ray r, Intersected *i, Color ambient, Light light, Sphere *spheres);
+Color castRay(int numHits, Ray r, Intersected *i, Color ambient, Light light, 
+      Sphere *spheres, Point eye);
 
 /* Cast a ray to every single pixel in the scene. Prints to a file in PPM
  * format. */
-void castAllRays(double, double, double, double, int, int, Point, Sphere *s,
+void castAllRays(double, double, double, double, int, int, Point eye, Sphere *s,
       Color ambient, Light light);
 
 #endif

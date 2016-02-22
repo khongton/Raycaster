@@ -4,6 +4,8 @@
 #include "vecmath.h"
 #include "collisions.h"
 
+#define DISCRIM_VALUE 4
+
 MaybePoint CreateMaybePoint(int boolean, Point point) {
    MaybePoint maybe;
    
@@ -15,7 +17,7 @@ MaybePoint CreateMaybePoint(int boolean, Point point) {
 
 /* Convenience function to calculate discriminants. */
 double discriminant(double a, double b, double c) {
-   return sqrt(b * b - 4 * a * c);   
+   return sqrt(b * b - DISCRIM_VALUE * a * c);   
 }
 
 /* Determine where the point is along a ray. Essentially, it "slides" a 
@@ -79,11 +81,11 @@ MaybePoint SphereIntersectionPoint(Ray ray, Sphere sphere) {
 }
 
 int FindIntersectionPoints(Sphere *slist, Ray r, int num, Intersected *list) {
-   int i, numHit = 0;
-   for (i = 0; i < num; i++) {
-      MaybePoint mbp = SphereIntersectionPoint(r, slist[i]);
+   int sphereIndex, numHit = 0;
+   for (sphereIndex = 0; sphereIndex < num; sphereIndex++) {
+      MaybePoint mbp = SphereIntersectionPoint(r, slist[sphereIndex]);
       if (mbp.isPoint) {
-         list->hitSpheres[numHit] = slist[i];
+         list->hitSpheres[numHit] = slist[sphereIndex];
          list->hitPoints[numHit] = mbp.p;
          numHit++;
       }

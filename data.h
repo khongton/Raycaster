@@ -5,6 +5,8 @@
 typedef struct {
    double ambient;
    double diffuse;
+   double specular;
+   double roughness;
 } Finish;
 
 /* A data structure to represent color in RGB format. */
@@ -66,7 +68,7 @@ Sphere CreateSphere(Point origin, double rad, Color col, Finish fin);
 Color CreateColor(double r, double g, double b);
 
 /* Initialize a finish value */
-Finish CreateFinish(double fin, double diff);
+Finish CreateFinish(double fin, double diff, double spec, double rough);
 
 /* Initialize a light struct */
 Light CreateLight(Point point, Color color);

@@ -42,10 +42,12 @@ Sphere CreateSphere(Point origin, double rad, Color col, Finish fin) {
    return sphere;
 }
 
-Finish CreateFinish(double value, double diff) {
+Finish CreateFinish(double value, double diff, double spec, double rough) {
    Finish finish;
    finish.ambient = value;
    finish.diffuse = diff;
+   finish.specular = spec;
+   finish.roughness = rough;
    return finish;
 }
 
