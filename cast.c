@@ -6,6 +6,13 @@
 #include "collisions.h"
 #include "cast.h"
 
+typedef struct {
+   double red;
+   double green;
+   double blue;
+} DiffuseComp;
+
+/* Compute the distance between two points. */
 double distance(Point p1, Point p2) {
    double dx = p2.x - p1.x;
    double dy = p2.y - p1.y;
@@ -21,20 +28,56 @@ double distance(Point p1, Point p2) {
  * doubleVal will be casted first, then multipled by 255, giving us the wrong
  * result. */
 int convertColor(double doubleVal) {
-   double scale = doubleVal * 255;
-   return (int) scale;
+   double temp = doubleVal * 255;
+   if (temp > 255)
+      return 255;
+   else if (temp < 0)
+      return 0;
+   else 
+      return (int) temp;
 }
 
-Color computeFinish(Sphere sphere, Color ambient) {
+DiffuseComp computeDiffuse(Sphere sphere, MaybePoint mbp, Color ambient, Light light, Sphere *spheres, 
+      Intersected *list) {
+   DiffuseComp diffuse;
+   diffuse.red = 0.0;
+   diffuse.green = 0.0;
+   diffuse.blue = 0.0;
+   
+   Vector sphereNormal = SphereNormalAt(sphere, mbp.p);
+   Vector scaleNormal = ScaleVector(sphereNormal, 0.01);
+   Point offPoint = TranslatePoint(mbp.p, scaleNormal); 
+   Vector pointToLight = fromTo(offPoint, light.position); 
+   Vector lightNormal = NormalizeVector(pointToLight);
+   double result = DotProduct(sphereNormal, lightNormal);
+   if (result <= 0.0)
+      result = 0.0;
+
+   Ray lightRay = CreateRay(offPoint, pointToLight);
+   int collisions = FindIntersectionPoints(spheres, lightRay, 2, list);
+   if (collisions <= 0) {
+      diffuse.red = result * light.color.red * sphere.color.red * sphere.finish.diffuse;
+      diffuse.green = result * light.color.green * sphere.color.green * sphere.finish.diffuse;
+      diffuse.blue = result * light.color.blue * sphere.color.blue * sphere.finish.diffuse;
+   }
+   return diffuse;
+}
+
+Color computeFinish(Sphere sphere, MaybePoint mbp, Color ambient, Light light, Sphere *spheres,
+      Intersected *list) {
    Color color;
-   color.red = sphere.color.red * sphere.finish.ambient * ambient.red;
-   color.green = sphere.color.green * sphere.finish.ambient * ambient.green;
-   color.blue = sphere.color.blue * sphere.finish.ambient * ambient.blue;
+   DiffuseComp diffuse;
+
+   diffuse = computeDiffuse(sphere, mbp, ambient, light, spheres, list);
+
+   color.red = (sphere.color.red * sphere.finish.ambient * ambient.red) + diffuse.red;
+   color.green = (sphere.color.green * sphere.finish.ambient * ambient.green) + diffuse.green;
+   color.blue = (sphere.color.blue * sphere.finish.ambient * ambient.blue) + diffuse.blue;
    return color;
 }
 
 Color castRay(int numHits, Ray ray, Intersected *list, Color ambient,
-      Light light) {
+      Light light, Sphere *spheres) {
    MaybePoint mbp = SphereIntersectionPoint(ray, list->hitSpheres[0]), mbp2;
    Sphere closest = list->hitSpheres[0];
    
@@ -45,7 +88,7 @@ Color castRay(int numHits, Ray ray, Intersected *list, Color ambient,
          closest = list->hitSpheres[sphereIndex];
       }
    }
-   return computeFinish(closest, ambient);
+   return computeFinish(closest, mbp, ambient, light, spheres, list);
 }
 
 void castAllRays(double minX, double maxX, double minY, double maxY, int width, 
@@ -73,7 +116,7 @@ void castAllRays(double minX, double maxX, double minY, double maxY, int width,
          v = fromTo(eye, p);
          r = CreateRay(eye, v);
          if ((numHits = FindIntersectionPoints(spheres, r, 2, &list))) {
-            sphereColor = castRay(numHits, r, &list, ambient, light);
+            sphereColor = castRay(numHits, r, &list, ambient, light, spheres);
             printf("%d %d %d\n",
                   convertColor(sphereColor.red),
                   convertColor(sphereColor.green),
