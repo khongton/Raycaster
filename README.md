@@ -1,5 +1,7 @@
 # Raycaster
-A simple ray caster from a viewpoint onto two or more spheres. 
+A simple ray caster from a viewpoint onto some spheres in a scene. 
+
+Sample output of two spheres:
 
 ![image](https://github.com/khongton/Raycaster/blob/master/images/image.png)
 
