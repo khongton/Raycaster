@@ -16,6 +16,15 @@ typedef struct {
    double blue;
 } Ambient, Diffuse, Specular;
 
+void InitCanvas(Canvas *pic, double minX, double maxX, double minY, double maxY, int width, int height) {
+   pic->minWidth = minX;
+   pic->maxWidth = maxX;
+   pic->minHeight = minY;
+   pic->maxHeight = maxY;
+   pic->picWidth = width;
+   pic->picHeight = height;
+}
+
 double distance(Point p1, Point p2) {
    double dx = p2.x - p1.x;
    double dy = p2.y - p1.y;
@@ -146,12 +155,11 @@ Color castRay(int numHits, Ray ray, Intersected *list, Color ambient,
    return computeFinish(closest, mbp, ambient, light, spheres, list, eye);
 }
 
-void castAllRays(double minX, double maxX, double minY, double maxY, int width, 
-      int height, Point eye, Sphere *spheres, Color ambient, Light light) {
+void castAllRays(Canvas *pic, Point eye, Sphere *spheres, Color ambient, Light light) {
    int numHits;
-   double picWidth, picHeight;
-   double pixWidth = (maxX  - minX)/width;
-   double pixHeight = (maxY - minY)/height;
+   double curWidth, curHeight;
+   double pixWidth = (pic->maxWidth  - pic->minWidth)/pic->picWidth;
+   double pixHeight = (pic->maxHeight - pic->minHeight)/pic->picHeight;
 
    Intersected list;
    Sphere sphereHit[sizeof(spheres)];
@@ -164,10 +172,10 @@ void castAllRays(double minX, double maxX, double minY, double maxY, int width,
    Ray r;
    Color sphereColor;
 
-   printf("P3\n%d %d %d\n", width, height, 255);
-   for (picHeight = maxY; picHeight > minY; picHeight -= pixHeight) {
-      for (picWidth = minX; picWidth < maxX; picWidth += pixWidth) {
-         p = CreatePoint(picWidth, picHeight, 0.0);
+   printf("P3\n%d %d %d\n", pic->picWidth, pic->picHeight, MAX_COLOR);
+   for (curHeight = pic->maxHeight; curHeight > pic->minHeight; curHeight -= pixHeight) {
+      for (curWidth = pic->minWidth; curWidth < pic->maxWidth; curWidth += pixWidth) {
+         p = CreatePoint(curWidth, curHeight, 0.0);
          v = fromTo(eye, p);
          r = CreateRay(eye, v);
          if ((numHits = FindIntersectionPoints(spheres, r, 2, &list))) {
