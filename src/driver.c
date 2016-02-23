@@ -13,7 +13,9 @@ int main() {
 
    double minX = -10, maxX = 10, minY = -7.5, maxY = 7.5;
    int width = 512, height = 384;
-   
+   Canvas canvas;
+   InitCanvas(&canvas, minX, maxX, minY, maxY, width, height);
+
    Point eye = CreatePoint(0.0, 0.0, -14.0);
    Point blueSphere = CreatePoint(1.0, 1.0, 0.0);
    Point redSphere = CreatePoint(0.5, 1.5, -3.0);
@@ -32,7 +34,6 @@ int main() {
    spheres[0] = CreateSphere(blueSphere, 2.0, blue, largeFinish);
    spheres[1] = CreateSphere(redSphere, 0.5, red, smallFinish);
    
-   castAllRays(minX, maxX, minY, maxY, width, height, eye, spheres, ambient,
-         light);
+   castAllRays(&canvas, eye, spheres, ambient, light);
    return 0;
 }
