@@ -6,6 +6,7 @@
 #include "collisions.h"
 #include "cast.h"
 
+#define MAX_COLOR 255
 #define POINT_EPSILON 0.01
 
 /* Private data structures for types of color contribution */
@@ -25,9 +26,9 @@ double distance(Point p1, Point p2) {
 
 /* Convert double-representation of color to P3 readable int */
 int convertColor(double doubleVal) {
-   double temp = doubleVal * 255;
-   if (temp > 255)
-      return 255;
+   double temp = doubleVal * MAX_COLOR;
+   if (temp > MAX_COLOR)
+      return MAX_COLOR;
    else if (temp < 0)
       return 0;
    else 
@@ -177,7 +178,7 @@ void castAllRays(double minX, double maxX, double minY, double maxY, int width,
                   convertColor(sphereColor.blue));
          }
          else {
-            printf("255 255 255\n");
+            printf("%d %d %d\n", MAX_COLOR, MAX_COLOR, MAX_COLOR);
          }
       }
    }
