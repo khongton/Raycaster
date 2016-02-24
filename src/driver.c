@@ -34,6 +34,6 @@ int main() {
    spheres[0] = CreateSphere(blueSphere, 2.0, blue, largeFinish);
    spheres[1] = CreateSphere(redSphere, 0.5, red, smallFinish);
    
-   castAllRays(&canvas, eye, spheres, ambient, light);
+   castAllRays(&canvas, eye, spheres, ambient, light, 2);
    return 0;
 }

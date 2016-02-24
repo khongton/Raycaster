@@ -74,7 +74,7 @@ Ambient computeAmbient(Sphere sphere, Color ambient) {
  * does not contribute to the color. 
  *
  * This component gives depth to the scene. */
-Diffuse computeDiffuse(Pixel *pixel, Sphere *spheres, Intersected *list) {
+Diffuse computeDiffuse(Pixel *pixel, Sphere *spheres, Intersected *list, int numSpheres) {
    Diffuse diffuse;
    diffuse.red = 0.0;
    diffuse.green = 0.0;
@@ -89,7 +89,7 @@ Diffuse computeDiffuse(Pixel *pixel, Sphere *spheres, Intersected *list) {
       result = 0.0;
 
    Ray lightRay = CreateRay(pixel->offPoint, pointToLight);
-   int collisions = FindIntersectionPoints(spheres, lightRay, 2, list);
+   int collisions = FindIntersectionPoints(spheres, lightRay, numSpheres, list);
    if (!collisions) {
       diffuse.red = result * pixel->light.color.red * pixel->sphere.color.red * pixel->sphere.finish.diffuse;
       diffuse.green = result * pixel->light.color.green * pixel->sphere.color.green * pixel->sphere.finish.diffuse;
@@ -129,7 +129,7 @@ Specular computeSpec(Pixel *pixel, Intersected *list, Point eye) {
 
 /* Calculate the color contribution of light and ambient color to the sphere's color. */
 Color computeFinish(Sphere sphere, MaybePoint mbp, Color ambient, Light light, Sphere *spheres,
-      Intersected *list, Point eye) {
+      Intersected *list, Point eye, int numSpheres) {
    Color color;
    Ambient ambientComp;
    Diffuse diffuseComp;
@@ -138,7 +138,7 @@ Color computeFinish(Sphere sphere, MaybePoint mbp, Color ambient, Light light, S
    InitPixel(&pixel, sphere, mbp, ambient, light);
 
    ambientComp = computeAmbient(sphere, ambient);
-   diffuseComp = computeDiffuse(&pixel, spheres, list);
+   diffuseComp = computeDiffuse(&pixel, spheres, list, numSpheres);
    specComp = computeSpec(&pixel, list, eye);
 
    color.red = ambientComp.red + diffuseComp.red + specComp.red;
@@ -148,7 +148,7 @@ Color computeFinish(Sphere sphere, MaybePoint mbp, Color ambient, Light light, S
 }
 
 Color castRay(int numHits, Ray ray, Intersected *list, Color ambient,
-      Light light, Sphere *spheres, Point eye) {
+      Light light, Sphere *spheres, Point eye, int numSpheres) {
    MaybePoint mbp = SphereIntersectionPoint(ray, list->hitSpheres[0]), mbp2;
    Sphere closest = list->hitSpheres[0];
    
@@ -159,18 +159,18 @@ Color castRay(int numHits, Ray ray, Intersected *list, Color ambient,
          closest = list->hitSpheres[sphereIndex];
       }
    }
-   return computeFinish(closest, mbp, ambient, light, spheres, list, eye);
+   return computeFinish(closest, mbp, ambient, light, spheres, list, eye, numSpheres);
 }
 
-void castAllRays(Canvas *pic, Point eye, Sphere *spheres, Color ambient, Light light) {
+void castAllRays(Canvas *pic, Point eye, Sphere *spheres, Color ambient, Light light, int numSpheres) {
    int numHits;
    double curWidth, curHeight;
    double pixWidth = (pic->maxWidth  - pic->minWidth)/pic->picWidth;
    double pixHeight = (pic->maxHeight - pic->minHeight)/pic->picHeight;
 
    Intersected list;
-   Sphere sphereHit[sizeof(spheres)];
-   Point pointHit[sizeof(spheres)];
+   Sphere sphereHit[sizeof(spheres) * numSpheres];
+   Point pointHit[sizeof(spheres) * numSpheres];
    list.hitSpheres = sphereHit;
    list.hitPoints = pointHit;
    
@@ -185,8 +185,8 @@ void castAllRays(Canvas *pic, Point eye, Sphere *spheres, Color ambient, Light l
          p = CreatePoint(curWidth, curHeight, 0.0);
          v = fromTo(eye, p);
          r = CreateRay(eye, v);
-         if ((numHits = FindIntersectionPoints(spheres, r, 2, &list))) {
-            sphereColor = castRay(numHits, r, &list, ambient, light, spheres, eye);
+         if ((numHits = FindIntersectionPoints(spheres, r, numSpheres, &list))) {
+            sphereColor = castRay(numHits, r, &list, ambient, light, spheres, eye, numSpheres);
             printf("%d %d %d\n",
                   convertColor(sphereColor.red),
                   convertColor(sphereColor.green),
