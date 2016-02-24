@@ -13,7 +13,18 @@ typedef struct {
    int picHeight;
 } Canvas;
 
+typedef struct {
+   Sphere sphere;
+   MaybePoint mbp;
+   Color ambient;
+   Light light;
+   Vector sphereNorm;
+   Point offPoint;
+} Pixel;
+
 void InitCanvas(Canvas *picture, double, double, double, double, int, int);
+
+void InitPixel(Pixel *pixel, Sphere s, MaybePoint mbp, Color ambient, Light light);
 
 /* Coonvenience function to compute distance between two points */
 double distance(Point p1, Point p2);

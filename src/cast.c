@@ -16,6 +16,7 @@ typedef struct {
    double blue;
 } Ambient, Diffuse, Specular;
 
+/* Initialize a canvas struct to compartmentalize input data */
 void InitCanvas(Canvas *pic, double minX, double maxX, double minY, double maxY, int width, int height) {
    pic->minWidth = minX;
    pic->maxWidth = maxX;
@@ -25,6 +26,16 @@ void InitCanvas(Canvas *pic, double minX, double maxX, double minY, double maxY,
    pic->picHeight = height;
 }
 
+/* Initialize a pixel struct that holds data relevant to computing color */
+void InitPixel(Pixel *pixel, Sphere sphere, MaybePoint mbp, Color ambient, Light light) {
+   pixel->sphere = sphere;
+   pixel->mbp = mbp;
+   pixel->ambient = ambient;
+   pixel->light = light;
+   pixel->sphereNorm = SphereNormalAt(sphere, mbp.p);
+   pixel->offPoint = TranslatePoint(mbp.p, ScaleVector(pixel->sphereNorm, POINT_EPSILON));
+}
+
 double distance(Point p1, Point p2) {
    double dx = p2.x - p1.x;
    double dy = p2.y - p1.y;
@@ -32,6 +43,7 @@ double distance(Point p1, Point p2) {
 
    return sqrt(dx*dx + dy*dy + dz*dz);
 }
+
 
 /* Convert double-representation of color to P3 readable int */
 int convertColor(double doubleVal) {
@@ -62,29 +74,26 @@ Ambient computeAmbient(Sphere sphere, Color ambient) {
  * does not contribute to the color. 
  *
  * This component gives depth to the scene. */
-Diffuse computeDiffuse(Sphere sphere, MaybePoint mbp, Color ambient, Light light, Sphere *spheres, 
-      Intersected *list) {
+Diffuse computeDiffuse(Pixel *pixel, Sphere *spheres, Intersected *list) {
    Diffuse diffuse;
    diffuse.red = 0.0;
    diffuse.green = 0.0;
    diffuse.blue = 0.0;
    
-   Vector sphereNormal = SphereNormalAt(sphere, mbp.p); //used in dotprod
-   Vector scaleNormal = ScaleVector(sphereNormal, POINT_EPSILON);
-   Point offPoint = TranslatePoint(mbp.p, scaleNormal);  //used in ray
-   Vector pointToLight = fromTo(offPoint, light.position);  //used in ray 
+   Vector pointToLight = fromTo(pixel->offPoint, pixel->light.position);  //
    Vector lightNormal = NormalizeVector(pointToLight); //used in dotprod
-   
-   double result = DotProduct(sphereNormal, lightNormal);
+ 
+   //Light is not visible is result non-positive
+   double result = DotProduct(pixel->sphereNorm, lightNormal);
    if (result <= 0.0)
       result = 0.0;
 
-   Ray lightRay = CreateRay(offPoint, pointToLight);
+   Ray lightRay = CreateRay(pixel->offPoint, pointToLight);
    int collisions = FindIntersectionPoints(spheres, lightRay, 2, list);
    if (!collisions) {
-      diffuse.red = result * light.color.red * sphere.color.red * sphere.finish.diffuse;
-      diffuse.green = result * light.color.green * sphere.color.green * sphere.finish.diffuse;
-      diffuse.blue = result * light.color.blue * sphere.color.blue * sphere.finish.diffuse;
+      diffuse.red = result * pixel->light.color.red * pixel->sphere.color.red * pixel->sphere.finish.diffuse;
+      diffuse.green = result * pixel->light.color.green * pixel->sphere.color.green * pixel->sphere.finish.diffuse;
+      diffuse.blue = result * pixel->light.color.blue * pixel->sphere.color.blue * pixel->sphere.finish.diffuse;
    }
    return diffuse;
 }
@@ -94,30 +103,26 @@ Diffuse computeDiffuse(Sphere sphere, MaybePoint mbp, Color ambient, Light light
  * doesn't contribute to the color. 
  *
  * This component gives the sphere a glossy finish.*/
-Specular computeSpec(Sphere sphere, MaybePoint mbp, Color ambient, Light light, Sphere *spheres,
-      Intersected *list, Point eye) {
+Specular computeSpec(Pixel *pixel, Intersected *list, Point eye) {
    Specular spec;
    spec.red = 0.0;
    spec.green = 0.0;
    spec.blue = 0.0;
-   double roughVal = 1/sphere.finish.roughness;
+   double roughVal = 1 / pixel->sphere.finish.roughness;
 
-
-   Vector sphereNormal = SphereNormalAt(sphere, mbp.p);
-   Vector scaleNormal = ScaleVector(sphereNormal, POINT_EPSILON);
-   Point offPoint = TranslatePoint(mbp.p, scaleNormal); 
-   Vector pointToLight = fromTo(offPoint, light.position); 
-   Vector lightNormal = NormalizeVector(pointToLight); //Ldir
-   double result = DotProduct(sphereNormal, lightNormal); //LdotN
-
-   Vector eyeDir = fromTo(offPoint, eye);
-   Vector reflect = VecDiff(ScaleVector(sphereNormal, 2 * result), lightNormal);
+   Vector pointToLight = fromTo(pixel->offPoint, pixel->light.position);  
+   Vector lightNormal = NormalizeVector(pointToLight); 
+   Vector eyeDir = fromTo(pixel->offPoint, eye); 
+   double result = DotProduct(pixel->sphereNorm, lightNormal);
+   Vector reflect = VecDiff(ScaleVector(pixel->sphereNorm, 2 * result), lightNormal);
    double specIntensity = DotProduct(reflect, NormalizeVector(eyeDir));
+ 
+   //Color has specular component if the specular intensity is non-negative
    if (specIntensity > 0) {
       double intensity = pow(specIntensity, roughVal);
-      spec.red = light.color.red * sphere.finish.specular * intensity;
-      spec.green = light.color.green * sphere.finish.specular * intensity;
-      spec.blue = light.color.blue * sphere.finish.specular * intensity;
+      spec.red = pixel->light.color.red * pixel->sphere.finish.specular * intensity;
+      spec.green = pixel->light.color.green * pixel->sphere.finish.specular * intensity;
+      spec.blue = pixel->light.color.blue * pixel->sphere.finish.specular * intensity;
    }
    return spec;
 }
@@ -129,10 +134,12 @@ Color computeFinish(Sphere sphere, MaybePoint mbp, Color ambient, Light light, S
    Ambient ambientComp;
    Diffuse diffuseComp;
    Specular specComp;
+   Pixel pixel;
+   InitPixel(&pixel, sphere, mbp, ambient, light);
 
    ambientComp = computeAmbient(sphere, ambient);
-   diffuseComp = computeDiffuse(sphere, mbp, ambient, light, spheres, list);
-   specComp = computeSpec(sphere, mbp, ambient, light, spheres, list, eye);
+   diffuseComp = computeDiffuse(&pixel, spheres, list);
+   specComp = computeSpec(&pixel, list, eye);
 
    color.red = ambientComp.red + diffuseComp.red + specComp.red;
    color.green = ambientComp.green + diffuseComp.green + specComp.green;
