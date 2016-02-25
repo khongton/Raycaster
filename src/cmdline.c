@@ -7,7 +7,6 @@
 #include "cast.h"
 #include "cmdline.h"
 
-/* Counts sphere properly */
 int CountSpheres(FILE *input) {
    int numSpheres = 0;
    char ch;
@@ -21,6 +20,8 @@ int CountSpheres(FILE *input) {
 }
 
 
+/* Count the number of spaces in a string to determine how many args
+ * the string is holding */
 int VerifyLine(char *line) {
    int count = 1, result = 0;
    char *copy = line;
@@ -29,7 +30,7 @@ int VerifyLine(char *line) {
       copy++;
    }
 
-   if (count == 11) 
+   if (count == SPHERE_ARGS) 
       result = 1;
    return result;
 }
@@ -45,8 +46,8 @@ void ParseFile(FILE *input, Sphere **spheres) {
 
    while (fgets(line, sizeof(line), input)) {
       if (!VerifyLine(line) || sscanf(line, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-         &x, &y, &z, &radius, &r, &g, &b, &ambient, &diffuse, &specular, &rough) != 11) {
-         printf("malformed sphere on line %d...skipping\n", lineNum);
+         &x, &y, &z, &radius, &r, &g, &b, &ambient, &diffuse, &specular, &rough) != SPHERE_ARGS) {
+         fprintf(stderr, "malformed sphere on line %d...skipping\n", lineNum);
       }
       else {
          center = CreatePoint(x, y, z);

@@ -169,8 +169,8 @@ void castAllRays(Canvas *pic, Point eye, Sphere *spheres, Color ambient, Light l
    double pixHeight = (pic->maxHeight - pic->minHeight)/pic->picHeight;
 
    Intersected list;
-   Sphere sphereHit[sizeof(spheres) * numSpheres];
-   Point pointHit[sizeof(spheres) * numSpheres];
+   Sphere sphereHit[sizeof(Sphere) * numSpheres];
+   Point pointHit[sizeof(Point) * numSpheres];
    list.hitSpheres = sphereHit;
    list.hitPoints = pointHit;
    
@@ -179,6 +179,7 @@ void castAllRays(Canvas *pic, Point eye, Sphere *spheres, Color ambient, Light l
    Ray r;
    Color sphereColor;
 
+   //segfault here
    printf("P3\n%d %d %d\n", pic->picWidth, pic->picHeight, MAX_COLOR);
    for (curHeight = pic->maxHeight; curHeight > pic->minHeight; curHeight -= pixHeight) {
       for (curWidth = pic->minWidth; curWidth < pic->maxWidth; curWidth += pixWidth) {
