@@ -12,4 +12,4 @@ Clone the repository and compile using the compile.sh script. The compiler used 
 The input files needed by the program are text files, with each line specifying 11 double-floating point numbers. The 11 numbers are necessary in order to properly build a sphere in the scene.
 Execute a.out. Instructions will appear on proper usage.
 
-Last edit: 2/25/16 8:52
+Last edit: 2/25/16 9:49
